@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="AI-powered multi-specialist healthcare consultation system with medical coding and clinical note generation.">
+    <title>HealthAI — Intelligent Healthcare Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Background Glow Effects -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Header -->
+    <header id="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🏥</span>
+                <h1>Health<span class="gradient-text">AI</span></h1>
+            </div>
+            <p class="header-subtitle">AI-Powered Multi-Specialist Healthcare Consultation System</p>
+        </div>
+    </header>
+
+    <!-- Step Indicator -->
+    <nav id="step-indicator">
+        <div class="steps-container">
+            <div class="step-item active" data-step="1">
+                <div class="step-circle">1</div>
+                <span class="step-label">Complaint</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-item" data-step="2">
+                <div class="step-circle">2</div>
+                <span class="step-label">Summary</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-item" data-step="3">
+                <div class="step-circle">3</div>
+                <span class="step-label">Specialists</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-item" data-step="4">
+                <div class="step-circle">4</div>
+                <span class="step-label">Analysis</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-item" data-step="5">
+                <div class="step-circle">5</div>
+                <span class="step-label">Clinical Note</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-item" data-step="6">
+                <div class="step-circle">6</div>
+                <span class="step-label">Report</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- STEP 1: Patient Complaint Input + File Upload -->
+        <section id="step-1" class="step-panel active">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">📝</div>
+                    <div>
+                        <h2>Patient Complaint</h2>
+                        <p class="panel-desc">Enter the patient's symptoms as text, or upload clinical documents (PDF,
+                            TXT). You can use both.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <textarea id="patient-input"
+                        placeholder="E.g.: 55-year-old male patient. Presenting with severe headache, fever (38.5°C), nausea, and cough for the past 3 days. Previously diagnosed with diabetes and hypertension..."
+                        rows="7"></textarea>
+
+                    <!-- File Upload Area -->
+                    <div class="file-upload-area" id="file-upload-area">
+                        <div class="file-upload-dropzone" id="file-dropzone">
+                            <div class="dropzone-icon">📎</div>
+                            <div class="dropzone-text">
+                                <strong>Upload clinical documents</strong>
+                                <span>Drag & drop or click to browse — PDF, TXT supported</span>
+                            </div>
+                            <input type="file" id="file-input" multiple accept=".pdf,.txt,.csv" style="display:none">
+                        </div>
+                        <div class="file-list" id="file-list"></div>
+                    </div>
+
+                    <div class="input-footer">
+                        <span class="char-count" id="char-count">0 characters</span>
+                        <button id="btn-analyze" class="btn btn-primary btn-lg" onclick="startAnalysis()">
+                            <span class="btn-icon">🔬</span>
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: Approved Summary Review -->
+        <section id="step-2" class="step-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">✅</div>
+                    <div>
+                        <h2>Approved Professional Summary</h2>
+                        <p class="panel-desc">A professional symptom summary generated and verified by the
+                            Generator/Critic AI agents.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="result-box" id="summary-result">
+                        <div class="result-badge">Approved Summary</div>
+                        <div id="approved-summary" class="result-content"></div>
+                    </div>
+
+                    <div class="specialist-count-section">
+                        <label for="top-k-slider" class="slider-label">How many specialists should be
+                            recommended?</label>
+                        <div class="slider-group">
+                            <input type="range" id="top-k-slider" min="1" max="10" value="3"
+                                oninput="updateSliderValue(this)">
+                            <span id="top-k-value" class="slider-value">3</span>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+                        <button id="btn-recommend" class="btn btn-primary" onclick="recommendSpecialists()">
+                            <span class="btn-icon">👥</span>
+                            Recommend Specialists
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 3: Specialist Selection -->
+        <section id="step-3" class="step-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">👥</div>
+                    <div>
+                        <h2>Specialist Selection</h2>
+                        <p class="panel-desc">Review the AI-recommended specialists and modify the selection using the
+                            checkboxes.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="reasoning-box" id="reasoning-box">
+                        <div class="reasoning-header"><span>🧠</span> AI Selection Reasoning</div>
+                        <p id="ai-reasoning"></p>
+                    </div>
+                    <div id="specialist-grid" class="specialist-grid"></div>
+                    <div class="btn-row">
+                        <button class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+                        <button id="btn-consult" class="btn btn-primary" onclick="startConsultation()">
+                            <span class="btn-icon">🩺</span>
+                            Start Consultation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 4: Specialist Analysis + Extraction Results -->
+        <section id="step-4" class="step-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">🩺</div>
+                    <div>
+                        <h2>Specialist Analysis & Medical Coding</h2>
+                        <p class="panel-desc">Specialist evaluations, extracted conditions & medications with ICD-10 and
+                            ATC codes.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <!-- Specialist Tabs -->
+                    <div class="tabs-container" id="specialist-tabs-container">
+                        <div class="tabs-header" id="specialist-tabs-header"></div>
+                        <div class="tabs-content" id="specialist-tabs-content"></div>
+                    </div>
+
+                    <!-- Aggregated Summary -->
+                    <div class="aggregated-section">
+                        <h3 class="section-title"><span>📋</span> Unified Treatment Summary</h3>
+                        <div class="result-box">
+                            <div id="aggregated-summary" class="result-content"></div>
+                        </div>
+                    </div>
+
+                    <!-- Extraction Results -->
+                    <div class="extraction-section">
+                        <h3 class="section-title"><span>🧬</span> Medical Extraction & Coding</h3>
+                        <div class="extraction-grid">
+                            <!-- Conditions + ICD-10 -->
+                            <div class="extraction-card">
+                                <div class="extraction-card-header conditions-header">
+                                    <span>🔍</span> Conditions — ICD-10-CM
+                                </div>
+                                <div class="extraction-card-body" id="conditions-list">
+                                    <span class="extraction-empty">No conditions extracted</span>
+                                </div>
+                            </div>
+                            <!-- Medications + RxNorm -->
+                            <div class="extraction-card">
+                                <div class="extraction-card-header medications-header">
+                                    <span>💊</span> Medications — ATC
+                                </div>
+                                <div class="extraction-card-body" id="medications-list">
+                                    <span class="extraction-empty">No medications extracted</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-ghost" onclick="goToStep(3)">← Back</button>
+                        <button class="btn btn-primary" onclick="goToStep(5)">
+                            <span class="btn-icon">📝</span>
+                            Proceed to Clinical Note
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 5: Clinical Note Edit -->
+        <section id="step-5" class="step-panel">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-icon">📝</div>
+                    <div>
+                        <h2>Clinical Note — Edit & Approve</h2>
+                        <p class="panel-desc">Review and edit the AI-generated clinical note. Fill in patient details
+                            and approve.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="soap-patient-row">
+                        <div class="soap-patient-fields">
+                            <div class="soap-field">
+                                <label for="patient-name">Patient Name</label>
+                                <input type="text" id="patient-name" placeholder="Full name">
+                            </div>
+                            <div class="soap-field">
+                                <label for="patient-id">Patient ID</label>
+                                <input type="text" id="patient-id" placeholder="ID / MRN">
+                            </div>
+                            <div class="soap-field">
+                                <label for="patient-dob">Date of Birth</label>
+                                <input type="date" id="patient-dob">
+                            </div>
+                        </div>
+                        <div class="soap-date-block">
+                            <div class="soap-date-label">Date</div>
+                            <div class="soap-date-value" id="soap-date"></div>
+                            <div class="soap-date-label" style="margin-top: 0.5rem;">Time</div>
+                            <div class="soap-date-value" id="soap-time"></div>
+                        </div>
+                    </div>
+
+                    <div class="soap-editor-container">
+                        <div class="soap-toolbar">
+                            <span class="soap-badge">Clinical Note</span>
+                            <button class="btn btn-sm btn-ghost" onclick="resetSoap()">🔄 Reset</button>
+                        </div>
+                        <textarea id="soap-editor" rows="18" placeholder="Clinical note is loading..."></textarea>
+                    </div>
+
+                    <div class="soap-specialists-row" id="soap-specialists-row"></div>
+
+                    <div class="soap-signature-row">
+                        <div class="soap-field">
+                            <label for="approving-physician">Approving Physician</label>
+                            <input type="text" id="approving-physician" placeholder="Dr. ...">
+                        </div>
+                        <div class="soap-field">
+                            <label for="physician-title">Title / Specialty</label>
+                            <input type="text" id="physician-title" placeholder="e.g., Chief of Internal Medicine">
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-ghost" onclick="goToStep(4)">← Back</button>
+                        <button id="btn-finalize" class="btn btn-success btn-lg" onclick="finalizeReport()">
+                            <span class="btn-icon">✅</span>
+                            Approve & Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 6: Final Report (SOAP Document Only) -->
+        <section id="step-6" class="step-panel">
+            <div class="panel-card panel-card-report">
+                <div class="panel-header">
+                    <div class="panel-icon">📄</div>
+                    <div>
+                        <h2>Final Clinical Report</h2>
+                        <p class="panel-desc">The finalized clinical note is ready. Download it in different formats.
+                        </p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="download-bar">
+                        <span class="download-label">Download Report:</span>
+                        <div class="download-buttons">
+                            <button class="btn btn-download" onclick="downloadPDF()"><span>📄</span> PDF</button>
+                            <button class="btn btn-download" onclick="downloadTXT()"><span>📝</span> TXT</button>
+                            <button class="btn btn-download" onclick="downloadHTML()"><span>🌐</span> HTML</button>
+                            <button class="btn btn-download" onclick="printReport()"><span>🖨️</span> Print</button>
+                        </div>
+                    </div>
+
+                    <div id="soap-document" class="soap-document"></div>
+
+                    <div class="btn-row" style="margin-top: 2rem;">
+                        <div></div>
+                        <button class="btn btn-primary btn-lg" onclick="startOver()">
+                            <span class="btn-icon">🔄</span>
+                            New Patient
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p id="loading-text" class="loading-text">Processing...</p>
+            <div class="loading-progress-bar">
+                <div id="loading-progress" class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Print-only container -->
+    <div id="print-soap-document" class="print-only-document"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
