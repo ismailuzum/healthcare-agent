@@ -33,9 +33,9 @@ def generator_node(state: AnalyzeState) -> dict:
 RULES:
 - NEVER make a diagnosis (words like migraine, COVID, flu, diabetes, cancer, stroke, etc. are FORBIDDEN)
 - Only list and describe the symptoms professionally
-- Recommend "Doctor consultation is advised" (in the patient's language)
+- Recommend "Doctor consultation is advised" in English.
 
-CRITICAL LANGUAGE INSTRUCTION: Detect the language of the patient input below. You MUST write your entire response in that EXACT SAME language. If the input is in Turkish, respond in Turkish. If in English, respond in English. If in German, respond in German. Match the input language precisely.
+CRITICAL INSTRUCTION: You MUST write your entire response in English.
 
 Patient Input: {state['patient_input']}
 """
@@ -182,12 +182,12 @@ def recommend_specialists(case: str, top_k: int = 3) -> dict:
 3. EMERGENCY FLAGS:
    - "Chest pain", "can't breathe", "severe headache", "loss of consciousness" → Emergency Medicine MANDATORY
 
-CRITICAL LANGUAGE INSTRUCTION: Detect the language used in the CASE description. Write your `reasoning` in that EXACT SAME language.
+CRITICAL INSTRUCTION: You MUST write your `reasoning` in English.
 
 📤 OUTPUT FORMAT (JSON only):
 {{
   "selected_specialists": ["key1", "key2", "key3"],
-  "reasoning": "Brief explanation in the patient's language"
+  "reasoning": "Brief explanation in English"
 }}
 """
 
@@ -257,7 +257,7 @@ Analyze the case from your specialty's perspective (max 150 words). Address:
 2. Required tests/examinations
 3. Treatment recommendations
 
-CRITICAL INSTRUCTION: Detect the language used in the CASE description. You MUST write your ENTIRE assessment in that EXACT SAME language (e.g., if the case is in Turkish, respond completely in Turkish; if Dutch, respond in Dutch, etc.). Your response must only be the assessment.
+CRITICAL INSTRUCTION: You MUST write your ENTIRE assessment in English. Your response must only be the assessment.
 """
         response = completion(
             model="gpt-4o-mini",
@@ -295,7 +295,7 @@ Provide a unified summary addressing:
 
 Keep it under 200 words.
 
-CRITICAL INSTRUCTION: Detect the language used in the CASE description. You MUST write your ENTIRE assessment in that EXACT SAME language (e.g., if the case is in Turkish, respond completely in Turkish; if Dutch, respond in Dutch, etc.). Your response must only be the assessment.
+CRITICAL INSTRUCTION: You MUST write your ENTIRE summary in English. Your response must only be the summary.
 """
 
     response = completion(
@@ -310,22 +310,18 @@ CRITICAL INSTRUCTION: Detect the language used in the CASE description. You MUST
 # ── Extraction Nodes (from Advanced project) ──────────────────
 
 def condition_extractor_node(state: ConsultState) -> dict:
-    """Extract medical conditions from case + assessments"""
+    """Extract medical conditions explicitly mentioned by the patient from the case"""
     case = state["case"]
-    assessments = state.get("assessments", [])
 
-    assessments_text = "\n".join([
-        f"- {a['specialist']}: {a['assessment'][:300]}"
-        for a in assessments
-    ])
-
-    prompt = f"""Extract all medical conditions/diagnoses from this clinical data.
+    prompt = f"""Extract all medical conditions explicitly mentioned by the patient in this clinical data.
 
 PATIENT CASE:
 {case}
 
-SPECIALIST ASSESSMENTS:
-{assessments_text}
+CRITICAL RULES:
+1. ONLY extract conditions/diseases that the patient explicitly stated they already have or complain about.
+2. DO NOT infer, guess, or create any new diagnoses. You are NOT allowed to diagnose.
+3. If the patient does not explicitly mention a named medical condition, return an empty array [].
 
 Return ONLY a JSON array of condition names (strings). No markdown, no explanation.
 Example: ["hypertension", "diabetes mellitus type 2", "asthma"]
@@ -553,7 +549,7 @@ INSTRUCTIONS:
 - Include the ICD-10 and ATC codes inline where relevant (e.g., "Hypertension (ICD-10: I10)")
 - Keep it professional, concise, and clinically appropriate
 
-CRITICAL LANGUAGE INSTRUCTION: Detect the language of the CASE text. Write the ENTIRE clinical note in that SAME language. Only the ICD-10/ATC labels stay in English.
+CRITICAL INSTRUCTION: Write the ENTIRE clinical note in English.
 """
 
     try:

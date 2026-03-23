@@ -368,7 +368,7 @@ async function startConsultation() {
         setTimeout(() => {
             hideLoading();
             goToStep(4);
-            showToast(`Analysis complete: ${data.specialist_count} specialists, ${state.conditionCodes.length} ICD-10, ${state.medicationCodes.length} RxNorm codes.`, 'success');
+            showToast(`Analysis complete: ${data.specialist_count} specialists, ${state.conditionCodes.length} ICD-10, ${state.medicationCodes.length} ATC codes.`, 'success');
         }, 500);
 
     } catch (error) {
@@ -541,7 +541,7 @@ function renderSOAPDocument(data, containerId) {
             <!-- Header -->
             <div class="soap-doc-header">
                 <div class="soap-doc-patient">
-                    <div class="soap-doc-clinic">🏥 HealthAI Medical Report</div>
+                    <div class="soap-doc-clinic"><span style="color:var(--accent-green)">⚕️</span> HealthAI Medical Report</div>
                     <div class="soap-doc-field"><strong>Patient:</strong> ${escapeHtml(data.patientName)}</div>
                     <div class="soap-doc-field"><strong>Patient ID:</strong> ${escapeHtml(data.patientId)}</div>
                     <div class="soap-doc-field"><strong>Date of Birth:</strong> ${escapeHtml(data.patientDob)}</div>
@@ -563,12 +563,12 @@ function renderSOAPDocument(data, containerId) {
                 <div class="soap-doc-codes-grid">
                     ${condCodes ? `
                     <div class="soap-doc-codes-card">
-                        <div class="soap-doc-codes-header icd">🔍 Conditions — ICD-10-CM</div>
+                        <div class="soap-doc-codes-header icd">🔍 Conditions Extracted from Case — ICD-10-CM</div>
                         <div class="soap-doc-codes-body">${condCodes}</div>
                     </div>` : ''}
                     ${medCodes ? `
                     <div class="soap-doc-codes-card">
-                        <div class="soap-doc-codes-header rxn">💊 Medications — RxNorm</div>
+                        <div class="soap-doc-codes-header rxn">💊 Medications Extracted from Case — ATC</div>
                         <div class="soap-doc-codes-body">${medCodes}</div>
                     </div>` : ''}
                 </div>
@@ -617,7 +617,7 @@ function downloadTXT() {
     }).join(', ');
 
     const condLines = (d.condition_codes || []).map(c => `  ${c.chunk}: ICD-10 ${c.code}`).join('\n');
-    const medLines = (d.medication_codes || []).map(m => `  ${m.chunk}: RxNorm ${m.code}`).join('\n');
+    const medLines = (d.medication_codes || []).map(m => `  ${m.chunk}: ATC ${m.code}`).join('\n');
 
     const txt = `
 ══════════════════════════════════════════════
@@ -636,11 +636,11 @@ CLINICAL NOTE
 ─────────────────────────────────────────────
 ${d.final_soap_note || ''}
 
-MEDICAL CODES — ICD-10-CM
+CONDITIONS EXTRACTED FROM CASE — ICD-10-CM
 ─────────────────────────────────────────────
 ${condLines || '  None'}
 
-MEDICAL CODES — RxNorm
+MEDICATIONS EXTRACTED FROM CASE — ATC
 ─────────────────────────────────────────────
 ${medLines || '  None'}
 
@@ -737,8 +737,8 @@ function startOver() {
 
     document.getElementById('patient-input').value = '';
     document.getElementById('char-count').textContent = '0 characters';
-    document.getElementById('top-k-slider').value = 3;
-    document.getElementById('top-k-value').textContent = '3';
+    document.getElementById('top-k-slider').value = 4;
+    document.getElementById('top-k-value').textContent = '4';
     document.getElementById('patient-name').value = '';
     document.getElementById('patient-id').value = '';
     document.getElementById('patient-dob').value = '';

@@ -25,7 +25,7 @@
     <header id="app-header">
         <div class="header-content">
             <div class="logo">
-                <span class="logo-icon">🏥</span>
+                <span class="logo-icon" style="color:var(--accent-green)">⚕️</span>
                 <h1>Health<span class="gradient-text">AI</span></h1>
             </div>
             <p class="header-subtitle">AI-Powered Multi-Specialist Healthcare Consultation System</p>
@@ -131,9 +131,9 @@
                         <label for="top-k-slider" class="slider-label">How many specialists should be
                             recommended?</label>
                         <div class="slider-group">
-                            <input type="range" id="top-k-slider" min="1" max="10" value="3"
+                            <input type="range" id="top-k-slider" min="1" max="10" value="4"
                                 oninput="updateSliderValue(this)">
-                            <span id="top-k-value" class="slider-value">3</span>
+                            <span id="top-k-value" class="slider-value">4</span>
                         </div>
                     </div>
 
@@ -209,7 +209,7 @@
                             <!-- Conditions + ICD-10 -->
                             <div class="extraction-card">
                                 <div class="extraction-card-header conditions-header">
-                                    <span>🔍</span> Conditions — ICD-10-CM
+                                    <span>🔍</span> Conditions Extracted from Case — ICD-10-CM
                                 </div>
                                 <div class="extraction-card-body" id="conditions-list">
                                     <span class="extraction-empty">No conditions extracted</span>
@@ -218,7 +218,7 @@
                             <!-- Medications + RxNorm -->
                             <div class="extraction-card">
                                 <div class="extraction-card-header medications-header">
-                                    <span>💊</span> Medications — ATC
+                                    <span>💊</span> Medications Extracted from Case — ATC
                                 </div>
                                 <div class="extraction-card-body" id="medications-list">
                                     <span class="extraction-empty">No medications extracted</span>
